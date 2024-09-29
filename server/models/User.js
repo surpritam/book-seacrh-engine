@@ -28,6 +28,9 @@ const userSchema = new Schema(
   {
     toJSON: {
       virtuals: true,
+      transform: function (doc, ret) {
+        delete ret.password;
+        return ret;
     },
   }
 );

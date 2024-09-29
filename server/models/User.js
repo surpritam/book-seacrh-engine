@@ -33,6 +33,7 @@ const userSchema = new Schema(
         return ret;
     },
   }
+  }
 );
 
 // hash user password

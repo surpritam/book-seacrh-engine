@@ -28,6 +28,8 @@ if (process.env.NODE_ENV === 'production') {
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  cache: 'bounded',
+  persistedQueries: false,
   context: ({ req }) => {
     // Get the token from the headers
     const token = req.headers.authorization || '';

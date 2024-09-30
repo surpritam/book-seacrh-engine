@@ -4,9 +4,16 @@ const { ApolloServer } = require('apollo-server-express');
 const db = require('./config/connection');
 const { typeDefs, resolvers } = require('./schemas');
 const { getUserFromToken } = require('./utils/auth');
+const cors = require('cors');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+// Enable CORS
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' ? 'https://your-production-domain.com' : 'http://localhost:3000',
+  credentials: true,
+}));
 
 // Middleware for parsing request bodies
 app.use(express.urlencoded({ extended: true }));

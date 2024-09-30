@@ -1,16 +1,16 @@
-import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
+import { ApolloClient, InMemoryCache, createHttpLink, ApolloLink } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
+import { onError } from '@apollo/client/link/error';
+import Auth from './utils/auth'; // Adjust the path as necessary
 
 // HTTP connection to the API
 const httpLink = createHttpLink({
-  uri: '/graphql', // Ensure this matches your Apollo Server endpoint
+  uri: process.env.NODE_ENV === 'production' ? '/graphql' : 'http://localhost:3001/graphql',
 });
 
-// Middleware to include the token in headers
+// Middleware to attach the JWT token to headers
 const authLink = setContext((_, { headers }) => {
-  // Retrieve the token from localStorage
-  const token = localStorage.getItem('id_token');
-  // Return the headers to the context so httpLink can read them
+  const token = Auth.getToken();
   return {
     headers: {
       ...headers,
@@ -19,9 +19,27 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 
+// Error handling link
+const errorLink = onError(({ graphQLErrors, networkError }) => {
+  if (graphQLErrors) {
+    graphQLErrors.forEach(({ message, locations, path }) =>
+      console.error(
+        `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
+      )
+    );
+  }
+
+  if (networkError) {
+    console.error(`[Network error]: ${networkError}`);
+  }
+});
+
+// Combine all links
+const link = ApolloLink.from([errorLink, authLink, httpLink]);
+
 // Initialize Apollo Client
 const client = new ApolloClient({
-  link: authLink.concat(httpLink), // Chain authLink and httpLink
+  link,
   cache: new InMemoryCache(),
 });
 

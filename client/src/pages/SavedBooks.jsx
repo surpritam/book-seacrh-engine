@@ -7,8 +7,8 @@ import {
   Row,
   Col
 } from 'react-bootstrap';
-import { ME_QUERY } from '../graphql/queries';
-import { REMOVE_BOOK_MUTATION } from '../graphql/mutations';
+import { ME_QUERY } from '../utils/graphql/queries';
+import { REMOVE_BOOK_MUTATION } from '../utils/graphql/mutations';
 import Auth from '../utils/auth';
 
 const SavedBooks = () => {
